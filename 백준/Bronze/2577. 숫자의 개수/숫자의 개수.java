@@ -1,5 +1,3 @@
-
-
 import java.io.*;
 
 public class Main {
@@ -18,13 +16,13 @@ public class Main {
             int a = Integer.parseInt(br.readLine());
             result *= a;
         }
-        String result_st = Integer.toString(result);
-        int arr[] = new int[11];
-        for(char c : result_st.toCharArray()){
-            arr[c- '0']++;
+        int arr[] = new int[10];
+        while (result > 0){
+            arr[result % 10]++;
+            result/=10;
         }
         for (int i = 0; i < 10; i++) {
             bw.write(Integer.toString(arr[i])+"\n");
-        }
+    }
     }
 }
