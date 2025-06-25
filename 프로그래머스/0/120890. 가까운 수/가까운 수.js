@@ -1,15 +1,14 @@
 function solution(array, n) {
-    let diff = 101
-    let answer = array[0]
-    array.map(num => {
-        const tempNum = Math.max(num-n , n-num);
+    let diff = 101;
+    let answer = array[0];
+    const a = array.map(num => {
+        const tempNum = Math.abs(num-n);
         if ( tempNum < diff ) {
             diff = tempNum;
-            answer = num
+            answer = num;
         }else if( tempNum === diff){
             answer = Math.min(answer , num);
         };
-        // console.log(num,n,tempNum,diff)
     });
     return answer;
 }
