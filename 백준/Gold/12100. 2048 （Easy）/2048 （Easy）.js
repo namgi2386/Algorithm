@@ -170,25 +170,72 @@ function swipe(type, arr) {
     }
   }
 }
-let plag = false;
-// console.log("가능한 최댓값:", maxSumValue);
+
+function canMove(arr, direction) {
+  switch (direction) {
+    case 0: // 왼쪽
+      for (let i = 0; i < N; i++) {
+        for (let j = 1; j < N; j++) {
+          if (arr[i][j] !== 0) {
+            // 왼쪽에 빈 공간이 있거나
+            if (arr[i][j - 1] === 0) return true;
+            // 왼쪽에 같은 값이 있으면
+            if (arr[i][j - 1] === arr[i][j]) return true;
+          }
+        }
+      }
+      break;
+
+    case 1: // 오른쪽
+      for (let i = 0; i < N; i++) {
+        for (let j = N - 2; j >= 0; j--) {
+          if (arr[i][j] !== 0) {
+            if (arr[i][j + 1] === 0) return true;
+            if (arr[i][j + 1] === arr[i][j]) return true;
+          }
+        }
+      }
+      break;
+
+    case 2: // 위
+      for (let j = 0; j < N; j++) {
+        for (let i = 1; i < N; i++) {
+          if (arr[i][j] !== 0) {
+            if (arr[i - 1][j] === 0) return true;
+            if (arr[i - 1][j] === arr[i][j]) return true;
+          }
+        }
+      }
+      break;
+
+    case 3: // 아래
+      for (let j = 0; j < N; j++) {
+        for (let i = N - 2; i >= 0; i--) {
+          if (arr[i][j] !== 0) {
+            if (arr[i + 1][j] === 0) return true;
+            if (arr[i + 1][j] === arr[i][j]) return true;
+          }
+        }
+      }
+      break;
+  }
+  return false;
+}
 
 function dfs(level, arr) {
   if (level === 5 || maxOneValue === maxSumValue) {
-    return;
+    return maxOneValue === maxSumValue;
   }
-  if (maxOneValue === maxSumValue) {
-    plag = true;
-    return;
-  }
-  for (let s = 0; s < 4; s++) {
-    let copiedArr = deepCopy(arr);
-    swipe(s, copiedArr);
-    // console.log("?", maxOneValue, ...copiedArr);
 
-    dfs(level + 1, copiedArr);
-    if (plag) return;
+  for (let s = 0; s < 4; s++) {
+    if (canMove(arr, s)) {
+      // 이동 가능할 때만 탐색
+      let copiedArr = deepCopy(arr);
+      swipe(s, copiedArr);
+      if (dfs(level + 1, copiedArr)) return true;
+    }
   }
+  return false;
 }
 dfs(0, initArr);
 console.log(maxOneValue);
