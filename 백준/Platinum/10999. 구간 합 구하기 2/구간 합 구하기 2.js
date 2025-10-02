@@ -49,8 +49,6 @@ function update(node, start, end, rs, re, value) {
   let mid = Math.floor((start + end) / 2);
   update(node * 2, start, mid, rs, re, value);
   update(node * 2 + 1, mid + 1, end, rs, re, value);
-  propagate(node * 2, start, mid); // 
-  propagate(node * 2 + 1, mid + 1, end); // 
   tree[node] = tree[node * 2] + tree[node * 2 + 1];
 }
 //          [1-8]
