@@ -77,38 +77,11 @@ map2.set(0, 1);
 // console.log(map1);
 // console.log(map2);
 // 이후 map1 map2 정렬
-let sorted1 = [...map1].sort((a, b) => a[0] - b[0]);
-let sorted2 = [...map2].sort((a, b) => a[0] - b[0]);
-
 let answer = 0;
-
-let idx1 = 0;
-let idx2 = sorted2.length - 1;
-while (true) {
-  // console.log("in:", idx1, idx2, sorted1[idx1], sorted2[idx2]);
-
-  if (idx1 >= sorted1.length || idx2 < 0) break;
-  let [num1, cnt1] = sorted1[idx1];
-  let [num2, cnt2] = sorted2[idx2];
-  let sum = num1 + num2;
-  if (sum === orderSize) {
-    answer += cnt1 * cnt2;
-    idx1 === sorted1.length - 1 ? idx2-- : idx1++;
-  } else if (sum < orderSize) {
-    if (idx1 === sorted1.length - 1) {
-      idx1--;
-      idx2--;
-    } else {
-      idx1++;
-    }
-  } else if (sum > orderSize) {
-    if (idx2 === 0) {
-      idx1++;
-      idx2++;
-    } else {
-      idx2--;
-    }
-  }
+for (let i = 0; i <= orderSize; i++) {
+  let cnt1 = map1.get(i) || 0;
+  let cnt2 = map2.get(orderSize - i) || 0;
+  let sum = cnt1 * cnt2;
+  answer += sum;
 }
-
 console.log(answer);
