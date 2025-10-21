@@ -1,67 +1,66 @@
-const path = process.platform === "linux" ? "/dev/stdin" : "input.txt";
+const path = (process.platform === "linux" ? "/dev/stdin" : "input.txt");
 const inputValue = require("fs").readFileSync(path).toString().trim();
-let [N, initArr] = inputValue.split("\n");
-initArr = initArr.split("");
-// N = Number(N);
-// 3 8 7 9 2
-// ((3+8)*7-9)*2
-// dp다
-// N 은 최대 19
-// 숫자는 최대 10개 (N+1)/2 , 연산자는 최대 9개 (N+1)/2 -1
-// 최대연산 2^9만큼이내?
-// const [numN, opeN] = [Math.floor((N + 1) / 2), Math.floor((N + 1) / 2) - 1];
-// const dp = Array.from({ length: 1 << opeN }, () => -Infinity);
-let answer = -Infinity;
 
-function oper(arr) {
-  if (arr.length === 1) return Number(arr[0]);
-  let tempN = arr.length;
-  let [tempNumN, tempOpeN] = [
-    Math.floor((tempN + 1) / 2),
-    Math.floor((tempN + 1) / 2) - 1,
-  ];
-  let num = Number(arr[0]);
-  for (let i = 0; i < tempOpeN; i++) {
-    let op = arr[i * 2 + 1];
-    let next = Number(arr[i * 2 + 2]);
-    if (op === "+") {
-      num += next;
-    } else if (op === "-") {
-      num -= next;
-    } else if (op === "*") {
-      num *= next;
+const lines = inputValue.split('\n');
+const N = parseInt(lines[0]);
+const input = lines[1].replace(/\s/g, ''); // 두 번째 줄이 실제 수식
+
+// 숫자와 연산자 제대로 분리
+const numbers = [];
+const operators = [];
+
+let num = '';
+for (let i = 0; i < input.length; i++) {
+    const ch = input[i];
+    
+    if (ch >= '0' && ch <= '9') {
+        num += ch;
+    } else if (ch === '+' || ch === '-' || ch === '*') {
+        numbers.push(parseInt(num));
+        num = '';
+        operators.push(ch);
     }
-  }
-  return num;
+}
+numbers.push(parseInt(num)); // 마지막 숫자 추가
+
+const numCount = numbers.length;
+
+// dp[i][j] = i번째 숫자부터 j번째 숫자까지 구간의 최댓값/최솟값
+const maxDp = Array.from({length: numCount}, () => Array(numCount).fill(-Infinity));
+const minDp = Array.from({length: numCount}, () => Array(numCount).fill(Infinity));
+
+// 초기값: 한 개짜리 구간
+for (let i = 0; i < numCount; i++) {
+    maxDp[i][i] = numbers[i];
+    minDp[i][i] = numbers[i];
 }
 
-function dfs(arr) {
-  if (arr.length === 1) return Number(arr[0]);
-  answer = Math.max(answer, oper(arr));
-  let tempN = arr.length;
-  let [tempNumN, tempOpeN] = [
-    Math.floor((tempN + 1) / 2),
-    Math.floor((tempN + 1) / 2) - 1,
-  ];
-  for (let i = 0; i < tempOpeN; i++) {
-    let op = arr[i * 2 + 1];
-    let prev = Number(arr[i * 2]);
-    let next = Number(arr[i * 2 + 2]);
-    if (op === "+") {
-      prev += next;
-    } else if (op === "-") {
-      prev -= next;
-    } else if (op === "*") {
-      prev *= next;
+// 연산 함수
+function calculate(a, b, op) {
+    if (op === '+') return a + b;
+    if (op === '-') return a - b;
+    if (op === '*') return a * b;
+}
+
+// 구간 길이를 늘려가며 DP
+for (let len = 2; len <= numCount; len++) {
+    for (let i = 0; i <= numCount - len; i++) {
+        const j = i + len - 1;
+        
+        // k를 기준으로 구간 분할
+        for (let k = i; k < j; k++) {
+            const op = operators[k]; // k번째 연산자
+            
+            // 가능한 4가지 조합
+            const val1 = calculate(maxDp[i][k], maxDp[k+1][j], op);
+            const val2 = calculate(maxDp[i][k], minDp[k+1][j], op);
+            const val3 = calculate(minDp[i][k], maxDp[k+1][j], op);
+            const val4 = calculate(minDp[i][k], minDp[k+1][j], op);
+            
+            maxDp[i][j] = Math.max(maxDp[i][j], val1, val2, val3, val4);
+            minDp[i][j] = Math.min(minDp[i][j], val1, val2, val3, val4);
+        }
     }
-    let nextArr = [...arr.slice(0, i * 2), prev];
-    if (i * 2 + 3 < N) nextArr = [...nextArr, ...arr.slice(i * 2 + 3)];
-    dfs(nextArr);
-  }
 }
-if (initArr.length === 1) {
-  console.log(Number(initArr[0]));
-} else {
-  dfs(initArr, 0);
-  console.log(answer);
-}
+
+console.log(maxDp[0][numCount - 1]);
