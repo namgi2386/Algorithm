@@ -39,7 +39,7 @@ class Queue {
     this.size++;
   }
 
-  pop() {
+  shift() {
     if (this.size === 0) return undefined;
     const value = this.head.value;
     this.head = this.head.next;
@@ -86,13 +86,13 @@ function bfs() {
     let [r, c] = find(prevI, prevJ);
     if (r === -1 && c === -1) break;
     [prevI, prevJ] = [r, c];
-    let queue = new Queue();
+    let queue = [];
     queue.push([r, c]);
     board[r][c] = num;
     // let cnt = 0;
-    while (queue.size > 0) {
+    while (queue.length > 0) {
       // cnt = Math.max(cnt, queue.size);
-      let [r, c] = queue.pop();
+      let [r, c] = queue.shift();
 
       for (let d = 0; d < 4; d++) {
         let [rr, cc] = [r + dr[d], c + dc[d]];
