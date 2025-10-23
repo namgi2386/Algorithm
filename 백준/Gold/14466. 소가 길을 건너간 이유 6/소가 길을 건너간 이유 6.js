@@ -66,7 +66,7 @@ function isValid(r, c, rr, cc) {
   return true;
 }
 function find(prevI, prevJ) {
-  for (let i = 0; i < N; i++) {
+  for (let i = prevI; i < N; i++) {
     for (let j = 0; j < N; j++) {
       if (board[i][j] === 0) {
         return [i, j];
