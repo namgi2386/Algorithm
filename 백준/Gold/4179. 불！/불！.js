@@ -15,76 +15,83 @@ class Queue {
     this.queue.set(this.idx++, val);
   }
   shift() {
-    if (this.queue.size === 0) return null;
-    const val = this.queue.get(this.peek);
-    this.queue.delete(this.peek++);
-    return val;
+    if (this.queue.size === 0) return [[-1, -1], {}, 0];
+    return this.queue.get(this.peek++);
   }
   size() {
     return this.idx - this.peek;
   }
 }
 
-const fireTime = Array.from({ length: N }, () => Array(M).fill(Infinity));
-const jihunTime = Array.from({ length: N }, () => Array(M).fill(-1));
-
+let myQueue = new Queue();
 let fireQueue = new Queue();
 let START = [];
+
+for (let i = 0; i < N; i++) {
+  for (let j = 0; j < M; j++) {
+    if (board[i][j] === "J") START = [i, j];
+    if (board[i][j] === "F") fireQueue.push([i, j]);
+  }
+}
+
+let visited = Array.from({ length: N }, () => Array(M).fill(false));
+visited[START[0]][START[1]] = true;
+myQueue.push([START[0], START[1]]);
 
 const dr = [1, -1, 0, 0];
 const dc = [0, 0, 1, -1];
 
-for (let i = 0; i < N; i++) {
-  for (let j = 0; j < M; j++) {
-    if (board[i][j] === "J") {
-      START = [i, j];
+function isValid(r, c) {
+  if (0 > r || r >= N || 0 > c || c >= M) return false;
+  if (board[r][c] === "#") return false;
+  return true;
+}
+
+function spreadFire() {
+  let fireSize = fireQueue.size();
+  for (let i = 0; i < fireSize; i++) {
+    let [fr, fc] = fireQueue.shift();
+    for (let d = 0; d < 4; d++) {
+      const [nr, nc] = [fr + dr[d], fc + dc[d]];
+      if (!isValid(nr, nc)) continue;
+      if (board[nr][nc] === "F") continue;
+      board[nr][nc] = "F";
+      fireQueue.push([nr, nc]);
     }
-    if (board[i][j] === "F") {
-      fireQueue.push([i, j]);
-      fireTime[i][j] = 0;
+  }
+}
+
+function fnc() {
+  let cost = 0;
+  while (myQueue.size() > 0) {
+    // 먼저 현재 턴에 탈출 가능한지 체크
+    let Len = myQueue.size();
+    for (let i = 0; i < Len; i++) {
+      let [r, c] = myQueue.shift();
+      
+      // 현재 위치가 불이면 스킵
+      if (board[r][c] === "F") continue;
+      
+      // 가장자리면 탈출
+      if (r === 0 || c === 0 || r === N - 1 || c === M - 1) {
+        return cost + 1;
+      }
+
+      for (let d = 0; d < 4; d++) {
+        const [rr, cc] = [r + dr[d], c + dc[d]];
+        if (!isValid(rr, cc)) continue;
+        if (visited[rr][cc]) continue;
+        if (board[rr][cc] === "F") continue;
+        visited[rr][cc] = true;
+        myQueue.push([rr, cc]);
+      }
     }
-  }
-}
-
-// 불 BFS
-while (fireQueue.size() > 0) {
-  const [r, c] = fireQueue.shift();
-  for (let d = 0; d < 4; d++) {
-    const [nr, nc] = [r + dr[d], c + dc[d]];
-    if (nr < 0 || nr >= N || nc < 0 || nc >= M) continue;
-    if (board[nr][nc] === "#") continue;
-    if (fireTime[nr][nc] !== Infinity) continue;
-    fireTime[nr][nc] = fireTime[r][c] + 1;
-    fireQueue.push([nr, nc]);
-  }
-}
-
-// 지훈이 BFS
-let myQueue = new Queue();
-myQueue.push([START[0], START[1]]);
-jihunTime[START[0]][START[1]] = 0;
-
-while (myQueue.size() > 0) {
-  const [r, c] = myQueue.shift();
-  
-  // 탈출 체크
-  if (r === 0 || c === 0 || r === N - 1 || c === M - 1) {
-    console.log(jihunTime[r][c] + 1);
-    process.exit(0);
-  }
-  
-  for (let d = 0; d < 4; d++) {
-    const [nr, nc] = [r + dr[d], c + dc[d]];
-    if (nr < 0 || nr >= N || nc < 0 || nc >= M) continue;
-    if (board[nr][nc] === "#") continue;
-    if (jihunTime[nr][nc] !== -1) continue;
     
-    // 지훈이가 다음 칸에 도착하는 시간이 불보다 빨라야 함
-    if (jihunTime[r][c] + 1 >= fireTime[nr][nc]) continue;
-    
-    jihunTime[nr][nc] = jihunTime[r][c] + 1;
-    myQueue.push([nr, nc]);
+    // 지훈이 이동 후 불 확산
+    spreadFire();
+    cost++;
   }
+  return "IMPOSSIBLE";
 }
 
-console.log("IMPOSSIBLE");
+console.log(fnc());
