@@ -22,11 +22,11 @@ for (let i = 1; i < N; i++) {
   // 일치하긴함
   if (failArr[i] > 0) {
     const prev = failArr[i] - 1;
+    // 재귀반복이라면 이전값으로
     maxPront[i] = failArr[prev] > 0 ? maxPront[prev] : failArr[i];
+    const back = i + 1 - maxPront[i];
+    if (back >= maxPront[i]) answer += back;
   }
-  if (maxPront[i] === 0) continue;
-  const back = i + 1 - maxPront[i];
-  if (back >= maxPront[i]) answer += back;
 }
 
 console.log(answer);
