@@ -7,28 +7,34 @@ let [N, arr] = inputValue
 
 N = Number(N);
 
-let answer = 0;
-const tree = new Array(N * 4).fill(0);
-function update(node, start, end, idx) {
-  if (start > idx || end < idx) return;
-  tree[node]++;
-  if (start >= end) return;
-  const mid = Math.floor((start + end) / 2);
-  update(node * 2, mid + 1, end, idx);
-  update(node * 2 + 1, start, mid, idx);
+const sorted = [...arr].sort((a, b) => a - b);
+const compress = new Map();
+sorted.forEach((val, _) => {
+  if (!compress.has(val)) {
+    compress.set(val, compress.size + 1);
+  }
+});
+arr = arr.map((val) => compress.get(val));
+
+const fenwickTree = Array(N + 1).fill(0);
+function updateFanwick(idx) {
+  while (idx <= N) {
+    fenwickTree[idx]++;
+    idx += idx & -idx;
+  }
 }
-function query(node, start, end, left, right) {
-  if (start > right || end < left) return 0;
-  if (start >= left && end <= right) return tree[node];
-  const mid = Math.floor((start + end) / 2);
-  return (
-    query(node * 2, mid + 1, end, left, right) +
-    query(node * 2 + 1, start, mid, left, right)
-  );
+function queryFanwinck(idx) {
+  let sum = 0;
+  while (idx > 0) {
+    sum += fenwickTree[idx];
+    idx -= idx & -idx;
+  }
+  return sum;
 }
-for (let i = 0; i < N; i++) {
+let answerFenwick = 0;
+for (let i = N - 1; i >= 0; i--) {
   const num = arr[i];
-  answer += query(1, 1, N, num + 1, N);
-  update(1, 1, N, num);
+  answerFenwick += queryFanwinck(num - 1);
+  updateFanwick(num);
 }
-console.log(answer);
+console.log(answerFenwick);
