@@ -7,12 +7,11 @@ let [initN, ...arr] = inputValue
 
 const [N, M] = initN;
 // 0 1 2 3 4 , 5 6 7 8 9
-const canDo = Array.from({ length: N * 2 }, () => []);
+const canDo = Array.from({ length: N }, () => []);
 for (let i = 0; i < N; i++) {
   const cnt = arr[i][0];
   for (let j = 1; j < cnt + 1; j++) {
     canDo[i].push(arr[i][j]);
-    canDo[i + N].push(arr[i][j]);
   }
 }
 
@@ -30,7 +29,13 @@ function dfs(person, visited) {
   return false;
 }
 let answer = 0;
-for (let i = 0; i < 2 * N; i++) {
+for (let i = 0; i < N; i++) {
+  const visited = new Array(M + 1).fill(false);
+  if (dfs(i, visited)) {
+    answer++;
+  }
+}
+for (let i = 0; i < N; i++) {
   const visited = new Array(M + 1).fill(false);
   if (dfs(i, visited)) {
     answer++;
