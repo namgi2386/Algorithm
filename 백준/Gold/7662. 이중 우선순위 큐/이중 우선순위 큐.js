@@ -1,156 +1,241 @@
 const readline = require('readline');
+
 const rl = readline.createInterface({
   input: process.stdin,
-  output: process.stdout
+  output: process.output,
 });
 
-class Heap {
-  constructor(compareFunc) {
-    this.heap = [];
-    this.compareFunc = compareFunc;
-  }
-  
-  compare(a, b) {
-    return this.compareFunc(this.heap[a], this.heap[b]);
-  }
-  
-  push(n) {
-    this.heap.push(n);
-    let childIdx = this.heap.length - 1;
-    
-    while (Math.floor((childIdx - 1) / 2) >= 0) {
-      const parentIdx = Math.floor((childIdx - 1) / 2);
-      if (this.compare(childIdx, parentIdx)) break;
-      [this.heap[parentIdx], this.heap[childIdx]] = [this.heap[childIdx], this.heap[parentIdx]];
-      childIdx = parentIdx;
-    }
-  }
-  
-  pop() {
-    if (this.heap.length === 0) return null;
-    if (this.heap.length === 1) return this.heap.pop();
-    
-    const popped = this.heap[0];
-    this.heap[0] = this.heap.pop();
-    
-    let parentIdx = 0;
-    while (parentIdx * 2 + 1 < this.heap.length) {
-      let childIdx = parentIdx * 2 + 1;
-      if (childIdx + 1 < this.heap.length && this.compare(childIdx, childIdx + 1)) {
-        childIdx++;
-      }
-      if (this.compare(childIdx, parentIdx)) break;
-      [this.heap[parentIdx], this.heap[childIdx]] = [this.heap[childIdx], this.heap[parentIdx]];
-      parentIdx = childIdx;
-    }
-    
-    return popped;
-  }
-  
-  isEmpty() {
-    return this.heap.length === 0;
-  }
-  
-  top() {
-    return this.heap[0];
-  }
-  
-  reset() {
-    this.heap = [];
-  }
-}
-
-class DoubleEndedPQueue {
+class MaxHeap {
   constructor() {
-    this.maxHeap = new Heap((a, b) => a < b);  // 최대힙
-    this.minHeap = new Heap((a, b) => a > b);  // 최소힙
-    this.map = new Map();  // 값의 개수 추적
+    this.heap = [null];
   }
-  
+
   push(value) {
-    this.maxHeap.push(value);
-    this.minHeap.push(value);
-    this.map.set(value, (this.map.get(value) || 0) + 1);
-  }
-  
-  popMax() {
-    const popped = this.maxHeap.pop();
-    if (popped !== null) {
-      this.map.set(popped, this.map.get(popped) - 1);
-      this.clear();
+    this.heap.push(value);
+
+    let currentIndex = this.heap.length - 1;
+    let parentIndex = Math.floor(currentIndex / 2);
+
+    while (
+      currentIndex > 1 &&
+      this.heap[currentIndex] > this.heap[parentIndex]
+    ) {
+      const tmp = this.heap[currentIndex];
+      this.heap[currentIndex] = this.heap[parentIndex];
+      this.heap[parentIndex] = tmp;
+
+      currentIndex = parentIndex;
+      parentIndex = Math.floor(currentIndex / 2);
     }
   }
-  
-  popMin() {
-    const popped = this.minHeap.pop();
-    if (popped !== null) {
-      this.map.set(popped, this.map.get(popped) - 1);
-      this.clear();
+
+  pop() {
+    if (this.heap.length < 2) {
+      return;
     }
+
+    if (this.heap.length === 2) {
+      return this.heap.pop();
+    }
+
+    const value = this.heap[1];
+    this.heap[1] = this.heap.pop();
+
+    let currentIndex = 1;
+    let leftChildIndex = 2;
+    let rightChildIndex = 3;
+
+    while (leftChildIndex < this.heap.length) {
+      let swapIndex = leftChildIndex;
+
+      if (
+        rightChildIndex < this.heap.length &&
+        this.heap[rightChildIndex] > this.heap[leftChildIndex]
+      ) {
+        swapIndex = rightChildIndex;
+      }
+
+      if (this.heap[currentIndex] > this.heap[swapIndex]) {
+        break;
+      }
+
+      const tmp = this.heap[currentIndex];
+      this.heap[currentIndex] = this.heap[swapIndex];
+      this.heap[swapIndex] = tmp;
+
+      currentIndex = swapIndex;
+      leftChildIndex = currentIndex * 2;
+      rightChildIndex = currentIndex * 2 + 1;
+    }
+
+    return value;
   }
-  
-  // 핵심: Lazy Deletion
+
+  length() {
+    return this.heap.length - 1;
+  }
+
   clear() {
-    while (!this.minHeap.isEmpty() && this.map.get(this.minHeap.top()) === 0) {
-      this.minHeap.pop();
-    }
-    while (!this.maxHeap.isEmpty() && this.map.get(this.maxHeap.top()) === 0) {
-      this.maxHeap.pop();
-    }
-  }
-  
-  getResult() {
-    this.clear();
-    if (this.maxHeap.isEmpty() || this.minHeap.isEmpty()) {
-      return "EMPTY";
-    }
-    return `${this.maxHeap.top()} ${this.minHeap.top()}`;
-  }
-  
-  reset() {
-    this.maxHeap.reset();
-    this.minHeap.reset();
-    this.map.clear();
+    this.heap = [null];
   }
 }
 
-const depq = new DoubleEndedPQueue();
-const answer = [];
+class MinHeap {
+  constructor() {
+    this.heap = [null];
+  }
+
+  push(value) {
+    this.heap.push(value);
+
+    let currentIndex = this.heap.length - 1;
+    let parentIndex = Math.floor(currentIndex / 2);
+
+    while (
+      currentIndex > 1 &&
+      this.heap[currentIndex] < this.heap[parentIndex]
+    ) {
+      const tmp = this.heap[currentIndex];
+      this.heap[currentIndex] = this.heap[parentIndex];
+      this.heap[parentIndex] = tmp;
+
+      currentIndex = parentIndex;
+      parentIndex = Math.floor(currentIndex / 2);
+    }
+  }
+
+  pop() {
+    if (this.heap.length < 2) {
+      return;
+    }
+
+    if (this.heap.length === 2) {
+      return this.heap.pop();
+    }
+
+    const value = this.heap[1];
+    this.heap[1] = this.heap.pop();
+
+    let currentIndex = 1;
+    let leftChildIndex = 2;
+    let rightChildIndex = 3;
+
+    while (leftChildIndex < this.heap.length) {
+      let swapIndex = leftChildIndex;
+
+      if (
+        rightChildIndex < this.heap.length &&
+        this.heap[rightChildIndex] < this.heap[leftChildIndex]
+      ) {
+        swapIndex = rightChildIndex;
+      }
+
+      if (this.heap[currentIndex] < this.heap[swapIndex]) {
+        break;
+      }
+
+      const tmp = this.heap[currentIndex];
+      this.heap[currentIndex] = this.heap[swapIndex];
+      this.heap[swapIndex] = tmp;
+
+      currentIndex = swapIndex;
+      leftChildIndex = currentIndex * 2;
+      rightChildIndex = currentIndex * 2 + 1;
+    }
+
+    return value;
+  }
+
+  length() {
+    return this.heap.length - 1;
+  }
+
+  clear() {
+    this.heap = [null];
+  }
+}
+
+const maxHeap = new MaxHeap();
+const minHeap = new MinHeap();
+let actual_quantity = new Map();
 let index = 0;
-let endLine = 0;
+let EndIndex = 0;
+let answer = '';
 
 rl.on('line', (line) => {
-  // 첫 줄 (테스트케이스 개수)
   if (index === 0) {
     index++;
     return;
   }
-  
-  // 새 테스트케이스 시작
-  if (index > endLine) {
-    endLine = Number(line) + index++;
-    depq.reset();
+
+  if (index > EndIndex) {
+    EndIndex = +line + index++;
+    //초기화 로직
+    maxHeap.clear();
+    minHeap.clear();
+    actual_quantity.clear();
     return;
   }
-  
-  // 명령어 처리
-  const [cmd, value] = line.split(' ');
-  
+
+  let [cmd, value] = line.split(' ');
+  value = +value;
+
   if (cmd === 'I') {
-    depq.push(Number(value));
-  } else {
-    Number(value) === 1 ? depq.popMax() : depq.popMin();
+    maxHeap.push(value);
+    minHeap.push(value);
+
+    if (actual_quantity.get(value) > 0) {
+      actual_quantity.set(value, actual_quantity.get(value) + 1);
+    } else {
+      actual_quantity.set(value, 1);
+    }
   }
-  
-  // 테스트케이스 종료
-  if (index === endLine) {
-    answer.push(depq.getResult());
+
+  if (cmd === 'D' && value === 1) {
+    let max = maxHeap.pop();
+    while (maxHeap.length() > 0 && actual_quantity.get(max) < 1) {
+      max = maxHeap.pop();
+    }
+    actual_quantity.set(max, actual_quantity.get(max) - 1);
   }
-  
+
+  if (cmd === 'D' && value === -1) {
+    let min = minHeap.pop();
+    while (minHeap.length() > 0 && actual_quantity.get(min) < 1) {
+      min = minHeap.pop();
+    }
+    actual_quantity.set(min, actual_quantity.get(min) - 1);
+  }
+
+  if (index === EndIndex) {
+    let max = null;
+    let min = null;
+
+    while (maxHeap.length() > 0) {
+      let value = maxHeap.pop();
+      if (actual_quantity.get(value) > 0) {
+        max = value;
+        break;
+      }
+    }
+
+    while (minHeap.length() > 0) {
+      let value = minHeap.pop();
+      if (actual_quantity.get(value) > 0) {
+        min = value;
+        break;
+      }
+    }
+
+    if (max === null || min === null) {
+      answer += 'EMPTY\n';
+    } else {
+      answer += `${max} ${min}\n`;
+    }
+  }
   index++;
 });
 
 rl.on('close', () => {
-  console.log(answer.join('\n'));
-  process.exit();
+  console.log(answer);
 });
