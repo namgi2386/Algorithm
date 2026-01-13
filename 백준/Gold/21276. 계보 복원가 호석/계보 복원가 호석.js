@@ -7,6 +7,7 @@ let [N, personArr, M, ...initArr] = inputValue
 
 N = Number(N);
 M = Number(M);
+let maxchildren = 0;
 const childArr = new Map();
 const personCheck = new Map();
 const childCnt = new Map();
@@ -22,6 +23,7 @@ for (let i = 0; i < M; i++) {
 }
 for (const node of childArr) {
   const nodeCnt = node[1].length;
+  maxchildren = Math.max(maxchildren, nodeCnt);
   if (childCnt.has(nodeCnt)) {
     const temp = childCnt.get(nodeCnt);
     temp.push(node[0]);
@@ -34,9 +36,14 @@ for (const node of childArr) {
 // console.log(childCnt);
 let answer = [];
 let cnt = 0;
-while (childCnt.get(cnt) !== undefined) {
+
+while (cnt <= maxchildren) {
   const patents = childCnt.get(cnt); // 자식이 cnt명인 부모들
   // console.log(cnt, patents);
+  if (childCnt.get(cnt) === undefined) {
+    cnt++;
+    continue;
+  }
   if (cnt === 0) {
     for (const parent of patents) {
       answer.push([parent, 0]);
