@@ -43,6 +43,10 @@ class MinHeap {
   swap(a, b) {
     [this.heap[a], this.heap[b]] = [this.heap[b], this.heap[a]];
   }
+  compare(a, b) {
+    if (a[2] !== b[2]) return a[2] - b[2];
+    return a[3] - b[3];
+  }
   push(val) {
     this.heap.push(val);
     this.bubbleUp();
@@ -59,7 +63,7 @@ class MinHeap {
     let idx = this.heap.length - 1;
     while (idx > 0) {
       let parent = Math.floor((idx - 1) / 2);
-      if (this.heap[parent][2] > this.heap[idx][2]) {
+      if (this.compare(this.heap[idx], this.heap[parent]) < 0) {
         this.swap(idx, parent);
         idx = parent;
       } else {
@@ -71,15 +75,15 @@ class MinHeap {
     let idx = 0;
     while (idx * 2 + 1 < this.heap.length) {
       let left = idx * 2 + 1;
-      let right = idx * 2 + 1;
+      let right = idx * 2 + 2;
       let smaller = left;
       if (
-        idx * 2 + 1 < this.heap.length &&
-        this.heap[left][2] > this.heap[right][2]
+        right < this.heap.length &&
+        this.compare(this.heap[right], this.heap[left]) < 0
       ) {
         smaller = right;
       }
-      if (this.heap[idx][2] <= this.heap[smaller][2]) {
+      if (this.compare(this.heap[idx], this.heap[smaller]) <= 0) {
         break;
       }
       this.swap(idx, smaller);
@@ -90,15 +94,17 @@ class MinHeap {
     return this.heap.length;
   }
 }
-//    0
-//  1  2
-// 3 4
 
 const myHeap = new MinHeap();
 myHeap.push([sr, sc, 0, 0]);
 
 while (myHeap.size() > 0) {
   const [pr, pc, cnt, leap] = myHeap.pop();
+
+  const [visitedCnt, visitedLeap] = visited[pr][pc];
+  if (cnt > visitedCnt || (cnt === visitedCnt && leap > visitedLeap)) {
+    continue;
+  }
 
   for (let d = 0; d < 4; d++) {
     const nr = pr + dr[d];
