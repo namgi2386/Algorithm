@@ -29,22 +29,76 @@ for (let i = 0; i < N; i++) {
   }
 }
 
-// console.log("board:\n", board);
-
-const visited = Array.from({ length: N }, () =>
-  new Array(M).fill([626, 626]),
-);
+const visited = Array.from({ length: N }, () => new Array(M).fill([626, 626]));
 visited[sr][sc] = [0, 0];
 
 function isValid(r, c) {
   return 0 <= r && r < N && 0 <= c && c < M;
 }
 
-const stack = [];
-stack.push([sr, sc, 0, 0]);
+class MinHeap {
+  constructor() {
+    this.heap = [];
+  }
+  swap(a, b) {
+    [this.heap[a], this.heap[b]] = [this.heap[b], this.heap[a]];
+  }
+  push(val) {
+    this.heap.push(val);
+    this.bubbleUp();
+  }
+  pop() {
+    if (this.heap.length === 0) return null;
+    if (this.heap.length === 1) return this.heap.pop();
+    const result = this.heap[0];
+    this.heap[0] = this.heap.pop();
+    this.bubbleDown();
+    return result;
+  }
+  bubbleUp() {
+    let idx = this.heap.length - 1;
+    while (idx > 0) {
+      let parent = Math.floor((idx - 1) / 2);
+      if (this.heap[parent][2] > this.heap[idx][2]) {
+        this.swap(idx, parent);
+        idx = parent;
+      } else {
+        break;
+      }
+    }
+  }
+  bubbleDown() {
+    let idx = 0;
+    while (idx * 2 + 1 < this.heap.length) {
+      let left = idx * 2 + 1;
+      let right = idx * 2 + 1;
+      let smaller = left;
+      if (
+        idx * 2 + 1 < this.heap.length &&
+        this.heap[left][2] > this.heap[right][2]
+      ) {
+        smaller = right;
+      }
+      if (this.heap[idx][2] <= this.heap[smaller][2]) {
+        break;
+      }
+      this.swap(idx, smaller);
+      idx = smaller;
+    }
+  }
+  size() {
+    return this.heap.length;
+  }
+}
+//    0
+//  1  2
+// 3 4
 
-while (stack.length > 0) {
-  const [pr, pc, cnt, leap] = stack.pop();
+const myHeap = new MinHeap();
+myHeap.push([sr, sc, 0, 0]);
+
+while (myHeap.size() > 0) {
+  const [pr, pc, cnt, leap] = myHeap.pop();
 
   for (let d = 0; d < 4; d++) {
     const nr = pr + dr[d];
@@ -58,22 +112,11 @@ while (stack.length > 0) {
     } else if (type === "l") {
       nowLeap++;
     }
-    // if (
-    //   pr === 5 &&
-    //   pc === 2 &&
-    //   cnt === 0 &&
-    //   leap === 1 &&
-    //   nr === 5 &&
-    //   nc === 1
-    // ) {
-    //   console.log("?", visited[nr][nc], nowCnt, nextCnt, nowLeap, nextLeap);
-    // }
     if (nowCnt > nextCnt || (nowCnt === nextCnt && nowLeap >= nextLeap))
       continue;
-    stack.push([nr, nc, nowCnt, nowLeap]);
+    myHeap.push([nr, nc, nowCnt, nowLeap]);
     visited[nr][nc] = [nowCnt, nowLeap];
   }
 }
-// console.log("visited:", visited);
 
 console.log(visited[er][ec].join(" "));
