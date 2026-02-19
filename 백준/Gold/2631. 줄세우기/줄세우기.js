@@ -3,13 +3,24 @@ const inputValue = require("fs").readFileSync(path).toString().trim();
 
 const [N, ...arr] = inputValue.split("\n").map(Number);
 
-const dp = new Array(N).fill(1);
-
+const lis = [];
 for (let i = 0; i < N; i++) {
-  for (let j = 0; j < i; j++) {
-    if (arr[j] < arr[i]) {
-      dp[i] = Math.max(dp[i], dp[j] + 1);
+  const num = arr[i];
+  if (lis.length === 0 || lis[lis.length - 1] < num) {
+    lis.push(num);
+  } else {
+    let left = 0;
+    let right = lis.length - 1;
+    while (left < right) {
+      const mid = Math.floor((left + right) / 2);
+      if (lis[mid] < num) {
+        left = mid + 1;
+      } else {
+        right = mid;
+      }
     }
+    lis[left] = num;
   }
+  // console.log(lis);
 }
-console.log(N - Math.max(...dp));
+console.log(N - lis.length);
