@@ -4,6 +4,13 @@ const inputValue = require("fs").readFileSync(path).toString().trim();
 let [TC, ...arr] = inputValue
   .split("\n")
   .map((c) => c.trim().split(" ").map(Number));
+
+const MAX = 10000;
+
+const dp = new Array(MAX);
+const prev = new Array(MAX); // 출처
+const codeToChar = ["D", "S", "L", "R"];
+
 class Queue {
   constructor() {
     this.list = [];
@@ -22,41 +29,41 @@ class Queue {
     return this.index - this.peek;
   }
 }
-function fnc(before, after) {
-  const dp = new Uint16Array(10000).fill(5001);
-  const ni = ["D", "S", "L", "R"];
-  let minimumCnt = 5001;
-  let answer = "";
-  dp[before] = 0;
-  let queue = new Queue();
-  queue.push([before, ""]);
-  while (queue.size() > 0) {
-    const [num, str] = queue.pop();
-    // console.log("in", num, str);
+function fnc(tc, before, after) {
+  const queue = new Queue();
+  queue.push(before);
+  dp[before] = tc + 1;
 
-    const numCnt = dp[num];
-    if (numCnt + 1 >= minimumCnt) continue;
+  while (queue.size() > 0) {
+    const num = queue.pop();
+    if (num === after) return;
+
     const nd = (num * 2) % 10000;
     const ns = num !== 0 ? num - 1 : 9999;
     const nl = ((num * 10) % 10000) + Math.floor(num / 1000);
     const nr = Math.floor(num / 10) + Math.floor(num % 10) * 1000;
     const nArr = [nd, ns, nl, nr];
     for (let i = 0; i < 4; i++) {
-      const nc = nArr[i];
-      if (dp[nc] <= numCnt + 1) continue;
+      const nc = nArr[i]; // 다음 값
+      if (dp[nc] === tc + 1) continue;
+      dp[nc] = tc + 1;
+      prev[nc] = [num, i];
       if (nc === after) {
-        minimumCnt = numCnt + 1;
-        answer = str + ni[i];
-        break;
+        return;
       }
-      dp[nc] = numCnt + 1;
-      queue.push([nc, str + ni[i]]);
+      queue.push(nc);
     }
   }
-  return answer;
 }
 for (let tc = 0; tc < Number(TC); tc++) {
   const [before, after] = arr[tc];
-  const ans = fnc(before, after);
-  console.log(ans);
+  fnc(tc, before, after);
+
+  const path = [];
+  let cur = after;
+  while (cur !== before) {
+    path.push(codeToChar[prev[cur][1]]); // 변환을 위한 커멘드 값
+    cur = prev[cur][0]; // 출처 (변환전 값)
+  }
+  console.log(path.reverse().join(""));
 }
