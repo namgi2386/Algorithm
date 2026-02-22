@@ -8,7 +8,8 @@ let [TC, ...arr] = inputValue
 const MAX = 10000;
 
 const dp = new Array(MAX);
-const prev = new Array(MAX); // 출처
+const prev = new Uint16Array(MAX);
+const move = new Uint8Array(MAX);
 const codeToChar = ["D", "S", "L", "R"];
 
 class Queue {
@@ -48,7 +49,8 @@ function fnc(tc, before, after) {
       const nc = nArr[i]; // 다음 값
       if (dp[nc] === tc + 1) continue;
       dp[nc] = tc + 1;
-      prev[nc] = [num, i];
+      prev[nc] = num;
+      move[nc] = i;
       if (nc === after) {
         return;
       }
@@ -56,6 +58,7 @@ function fnc(tc, before, after) {
     }
   }
 }
+const answer = [];
 for (let tc = 0; tc < Number(TC); tc++) {
   const [before, after] = arr[tc];
   fnc(tc, before, after);
@@ -63,8 +66,9 @@ for (let tc = 0; tc < Number(TC); tc++) {
   const path = [];
   let cur = after;
   while (cur !== before) {
-    path.push(codeToChar[prev[cur][1]]); // 변환을 위한 커멘드 값
-    cur = prev[cur][0]; // 출처 (변환전 값)
+    path.push(codeToChar[move[cur]]); // 변환을 위한 커멘드 값
+    cur = prev[cur]; // 출처 (변환전 값)
   }
-  console.log(path.reverse().join(""));
+  answer.push(path.reverse().join(""));
 }
+console.log(answer.join("\n"));
