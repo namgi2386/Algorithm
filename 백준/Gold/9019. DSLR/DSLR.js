@@ -1,59 +1,70 @@
-const fs = require("fs");
-const data = fs.readFileSync(0, "utf8").trim().split(/\s+/).map(Number);
+const data = require("fs")
+  .readFileSync(0, "utf8")
+  .trim()
+  .split(/\s+/)
+  .map(Number);
 
 let i = 0;
-const TC = data[i++];
+const TC = data[i++]; // 3188 -> 2808
 
 const MAX = 10000;
 
 const dp = new Array(MAX);
-const prev = new Uint16Array(MAX);
+const prev = new Uint16Array(MAX); // 5200 -> 3188
 const move = new Uint8Array(MAX);
-const codeToChar = ["D", "S", "L", "R"];
+const codeToChar = ["", "D", "S", "L", "R"];
 
-class Queue {
-  constructor() {
-    this.list = [];
-    this.index = 0;
-    this.peek = 0;
-  }
-  push(val) {
-    this.list.push(val);
-    this.index++;
-  }
-  pop() {
-    if (this.index === this.peek) return null;
-    return this.list[this.peek++];
-  }
-  size() {
-    return this.index - this.peek;
-  }
-}
+const q = new Uint16Array(MAX); // 2808 -> 2928
 
 function fnc(tc, before, after) {
-  const queue = new Queue();
-  queue.push(before);
+  let [tail, head] = [0, 0];
+  q[tail++] = before;
   dp[before] = tc + 1;
 
-  while (queue.size() > 0) {
-    const num = queue.pop();
+  while (head < tail) {
+    const num = q[head++];
     if (num === after) return;
 
     const nd = (num * 2) % 10000;
     const ns = num !== 0 ? num - 1 : 9999;
     const nl = (num % 1000) * 10 + ((num / 1000) | 0);
     const nr = ((num / 10) | 0) + (num % 10) * 1000;
-    const nArr = [nd, ns, nl, nr];
-    for (let i = 0; i < 4; i++) {
-      const nc = nArr[i]; // 다음 값
-      if (dp[nc] === tc + 1) continue;
-      dp[nc] = tc + 1;
-      prev[nc] = num;
-      move[nc] = i;
-      if (nc === after) {
+
+    if (dp[nd] !== tc + 1) {
+      dp[nd] = tc + 1;
+      prev[nd] = num;
+      move[nd] = 1;
+      if (nd === after) {
         return;
       }
-      queue.push(nc);
+      q[tail++] = nd;
+    }
+    if (dp[ns] !== tc + 1) {
+      dp[ns] = tc + 1;
+      prev[ns] = num;
+      move[ns] = 2;
+      if (ns === after) {
+        return;
+      }
+      q[tail++] = ns;
+    }
+    if (dp[nl] !== tc + 1) {
+      dp[nl] = tc + 1;
+      prev[nl] = num;
+      move[nl] = 3;
+      if (nl === after) {
+        return;
+      }
+      q[tail++] = nl;
+    }
+    if (dp[nr] !== tc + 1) {
+      dp[nr] = tc + 1;
+      prev[nr] = num;
+      move[nr] = 4;
+      if (nr === after) {
+        return;
+      }
+      q[tail++] = nr;
     }
   }
 }
