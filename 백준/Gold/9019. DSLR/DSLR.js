@@ -29,6 +29,7 @@ class Queue {
     return this.index - this.peek;
   }
 }
+
 function fnc(tc, before, after) {
   const queue = new Queue();
   queue.push(before);
@@ -40,8 +41,8 @@ function fnc(tc, before, after) {
 
     const nd = (num * 2) % 10000;
     const ns = num !== 0 ? num - 1 : 9999;
-    const nl = ((num * 10) % 10000) + Math.floor(num / 1000);
-    const nr = Math.floor(num / 10) + Math.floor(num % 10) * 1000;
+    const nl = (num % 1000) * 10 + ((num / 1000) | 0);
+    const nr = ((num / 10) | 0) + (num % 10) * 1000;
     const nArr = [nd, ns, nl, nr];
     for (let i = 0; i < 4; i++) {
       const nc = nArr[i]; // 다음 값
