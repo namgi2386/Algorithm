@@ -1,9 +1,8 @@
-const path = process.platform === "linux" ? "/dev/stdin" : "input.txt";
-const inputValue = require("fs").readFileSync(path).toString().trim();
+const fs = require("fs");
+const data = fs.readFileSync(0, "utf8").trim().split(/\s+/).map(Number);
 
-let [TC, ...arr] = inputValue
-  .split("\n")
-  .map((c) => c.trim().split(" ").map(Number));
+let i = 0;
+const TC = data[i++];
 
 const MAX = 10000;
 
@@ -60,7 +59,8 @@ function fnc(tc, before, after) {
 }
 const answer = [];
 for (let tc = 0; tc < Number(TC); tc++) {
-  const [before, after] = arr[tc];
+  const before = data[i++];
+  const after = data[i++];
   fnc(tc, before, after);
 
   const path = [];
