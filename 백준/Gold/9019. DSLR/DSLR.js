@@ -23,7 +23,7 @@ class Queue {
   }
 }
 function fnc(before, after) {
-  const dp = new Array(10000).fill(5001);
+  const dp = new Uint16Array(10000).fill(5001);
   const ni = ["D", "S", "L", "R"];
   let minimumCnt = 5001;
   let answer = "";
