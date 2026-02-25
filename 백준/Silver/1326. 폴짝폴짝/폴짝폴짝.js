@@ -32,6 +32,7 @@ queue.push([s, 0]);
 
 while (queue.size() > 0) {
   const [node, cnt] = queue.shift();
+  if (dp[e] <= cnt) continue;
 
   let jump = arr[node];
   for (let i = 1; node + jump * i < N; i++) {
