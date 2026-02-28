@@ -4,24 +4,24 @@ const inputValue = require("fs").readFileSync(path).toString().trim();
 let [N, M] = inputValue.split(" ").map(BigInt);
 // 최대공약수
 
-function fnc(a, b) {
-  if (a < b) {
-    [a, b] = [b, a];
+function gcd(a, b) {
+  while(b !== 0n) {
+    var t = b;
+    b = a % b;
+    a = t;
   }
-  if (b === 0n) {
-    return a;
-  }
-  return fnc(a % b, b);
+  return a;
 }
-const max = fnc(N, M);
+const max = gcd(N, M);
+const dn = N / max;
+const dm = M / max;
 
 for (let i = 1n; i * i <= max; i++) {
-
   if (max % i === 0n) {
-    console.log(`${i} ${N / i} ${M / i}`);
     const j = max / i;
+    console.log(`${i} ${j * dn} ${j * dm}`);
     if (i !== j) {
-      console.log(`${j} ${N / j} ${M / j}`);
+      console.log(`${j} ${i * dn} ${i * dm}`);
     }
   }
 }
