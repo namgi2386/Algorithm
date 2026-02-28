@@ -15,16 +15,16 @@ function gcd(a, b) {
 const max = gcd(N, M);
 const dn = N / max;
 const dm = M / max;
-let answer = "";
-
-for (let i = 1; i * i <= max; i++) {
+const mid = Math.sqrt(max);
+const answer = [];
+for (let i = 1; i < mid; i++) {
   if (max % i === 0) {
     const j = max / i;
-    answer += `${i} ${j * dn} ${j * dm}\n`;
-    if (i !== j) {
-      answer += `${j} ${i * dn} ${i * dm}\n`;
-    }
+    answer.push(`${i} ${j * dn} ${j * dm}`);
+    answer.push(`${j} ${i * dn} ${i * dm}`);
   }
 }
-
-console.log(answer.trim());
+if (mid === Math.floor(mid)) {
+  answer.push(`${mid} ${mid * dn} ${mid * dm}`);
+}
+process.stdout.write(answer.join("\n"));
