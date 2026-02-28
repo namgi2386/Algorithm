@@ -169,8 +169,8 @@ const minHeap = new MinHeap();
 const maxHeap = new MaxHeap();
 for (i = 1; i <= N; i++) {
   const [idx, point] = inputValue[i].split(" ").map(Number);
-  minHeap.push([point, idx, 0]);
-  maxHeap.push([point, idx, 0]); // point와 idx로 정렬 하는데, time 정보를 포함한다.
+  minHeap.push([point, idx]);
+  maxHeap.push([point, idx]); // point와 idx로 정렬 하는데, time 정보를 포함한다.
 }
 
 const M = Number(inputValue[N + 1]);
@@ -180,13 +180,13 @@ for (let i = 0; i < M; i++) {
 
   if (commend === "add") {
     const [idx, point] = [Number(etc[0]), Number(etc[1])];
-    minHeap.push([point, idx, i + 1]);
-    maxHeap.push([point, idx, i + 1]);
+    minHeap.push([point, idx]);
+    maxHeap.push([point, idx]);
   } else if (commend === "recommend") {
     if (Number(etc[0]) === 1) {
       // 최댓값
       while (true) {
-        const [maxPoint, maxIdx, maxTimer] = maxHeap.peek();
+        const [maxPoint, maxIdx] = maxHeap.peek();
         if (deletedSet.has(maxIdx)) {
           deletedSet.delete(maxIdx);
           maxHeap.pop();
@@ -198,7 +198,7 @@ for (let i = 0; i < M; i++) {
     } else if (Number(etc[0]) === -1) {
       // 최솟값
       while (true) {
-        const [minPoint, minIdx, minTimer] = minHeap.peek();
+        const [minPoint, minIdx] = minHeap.peek();
         if (deletedSet.has(minIdx)) {
           deletedSet.delete(minIdx);
           minHeap.pop();
