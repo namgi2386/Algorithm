@@ -70,9 +70,10 @@ visited.set(`${prr},${prc},${pbr},${pbc}`, 0);
 
 const stack = [];
 stack.push([prr, prc, pbr, pbc, 0]);
+let front = 0;
 let answer = false;
-while (stack.length > 0) {
-  const [rr, rc, br, bc, cnt] = stack.pop();
+while (front < stack.length) {
+  const [rr, rc, br, bc, cnt] = stack[front++];
   // console.log("?", rr, rc, br, bc, cnt);
   if (cnt === 10) continue;
 
