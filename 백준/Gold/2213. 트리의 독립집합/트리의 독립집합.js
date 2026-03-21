@@ -18,12 +18,11 @@ for (let i = 0; i < arr.length; i++) {
   graph[b].push(a);
 }
 
-const dp = Array.from({ length: N + 1 }, () => [0, 0, [], []]);
+const dp = Array.from({ length: N + 1 }, () => [0, 0]);
 function dfs(prev, node) {
   if (graph[node].length === 1 && node !== 1) {
     // 단말노드
     dp[node][1] = costs[node - 1];
-    dp[node][3] = [node];
     return;
   }
   for (let next of graph[node]) {
@@ -32,23 +31,44 @@ function dfs(prev, node) {
     // node 선택안함
     if (dp[next][0] >= dp[next][1]) {
       dp[node][0] += dp[next][0];
-      dp[node][2].push(...dp[next][2]);
     } else {
       dp[node][0] += dp[next][1];
-      dp[node][2].push(...dp[next][3]);
     }
     // node 선택함 = next는 선택 하면 안됨
     dp[node][1] += dp[next][0];
-    dp[node][3].push(...dp[next][2]);
   }
   dp[node][1] += costs[node - 1];
-  dp[node][3].push(node);
 }
 dfs(-1, 1);
+
+const stack = [];
+const answer = [];
+
 if (dp[1][0] >= dp[1][1]) {
   console.log(dp[1][0]);
-  console.log(dp[1][2].sort((a, b) => a - b).join(" "));
+  stack.push([-1, 1, 0]);
 } else {
   console.log(dp[1][1]);
-  console.log(dp[1][3].sort((a, b) => a - b).join(" "));
+  stack.push([-1, 1, 1]);
+  answer.push(1);
 }
+
+while (stack.length > 0) {
+  const [prev, node, type] = stack.pop();
+  for (const next of graph[node]) {
+    if (prev === next) continue;
+    if (type === 0) {
+      // node 선택 안함
+      if (dp[next][0] >= dp[next][1]) {
+        stack.push([node, next, 0]);
+      } else {
+        stack.push([node, next, 1]);
+        answer.push(next);
+      }
+    } else if (type === 1) {
+      // node 선택함
+      stack.push([node, next, 0]);
+    }
+  }
+}
+console.log(answer.sort((a, b) => a - b).join(" "));
