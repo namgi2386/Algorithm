@@ -1,30 +1,27 @@
 const path = process.platform === "linux" ? "/dev/stdin" : "input.txt";
 const inputValue = require("fs").readFileSync(path).toString().trim();
-let [initNums, arr] = inputValue.split("\n").map((c) => c.trim());
-const [N, M] = initNums.split(" ").map(Number);
 
-arr = arr
-  .split(" ")
-  .map(Number)
-  .sort((a, b) => a - b);
+let [initN, arr] = inputValue
+  .split("\n")
+  .map((c) => c.trim().split(" ").map(Number));
+arr.sort((a, b) => a - b);
+const [N, M] = initN;
 
 const stack = [];
 const answer = [];
-const visited = [];
-function dfs(level) {
-  if (level === M) {
+
+function dfs(visited, cnt) {
+  if (cnt === M) {
     answer.push(stack.join(" "));
     return;
   }
-  for (let i = 0; i < N; i++) {
-    if (!visited[i]) {
-      stack.push(arr[i]);
-      visited[i] = true;
-      dfs(level + 1);
-      visited[i] = false;
-      stack.pop();
-    }
+  for (let i = 1; i <= N; i++) {
+    const node = 1 << i;
+    if (visited & node) continue;
+    stack.push(arr[i - 1]);
+    dfs(visited | node, cnt + 1);
+    stack.pop();
   }
 }
-dfs(0);
+dfs(0, 0);
 console.log(answer.join("\n"));
