@@ -10,7 +10,8 @@ queries = queries.map((c, i) => [c[0], c[1], i]);
 const DN = Math.sqrt(N);
 queries.sort((a, b) => {
   const [da, db] = [Math.floor(a[0] / DN), Math.floor(b[0] / DN)];
-  return da === db ? a[1] - b[1] : da - db;
+  if (da !== db) return da - db;
+  return da % 2 === 0 ? a[1] - b[1] : b[1] - a[1];
 });
 // queries sorting
 // console.log("queries:", queries);
