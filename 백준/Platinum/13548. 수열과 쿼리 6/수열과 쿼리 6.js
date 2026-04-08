@@ -36,22 +36,22 @@ answer[initialPosition[2]] = maxCnt;
 // initialize
 // console.log("init:", prevLeft, prevRight, maxCnt);
 
-function fncPlus(idx) {
+const fncPlus = (idx) => {
   const node = arr[idx];
   dpForCnt[dp[node]]--;
   if (++dp[node] > maxCnt) {
     maxCnt = dp[node];
   }
   dpForCnt[dp[node]]++;
-}
-function fncMinus(idx) {
+};
+const fncMinus = (idx) => {
   const node = arr[idx];
 
   dpForCnt[dp[node]]--;
   dp[node]--;
   dpForCnt[dp[node]]++;
   if (dpForCnt[maxCnt] === 0) maxCnt--;
-}
+};
 
 for (let i = 1; i < M; i++) {
   const [nodeLeft, nodeRight, nodeIdx] = queries[i];
